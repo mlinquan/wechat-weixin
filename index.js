@@ -47,9 +47,7 @@ var wechatapi = function wechatapi(options) {
         "expires_on": 0 };
 
 
-    this.jsapi_ticket = {
-        "ticket": null,
-        "expires_on": 0 };
+    this.jsapi_ticket = {};
 
 
     this.cache = {
@@ -84,18 +82,20 @@ wechatapi.prototype = {
         secretKey = secretKey || this.options.AESKey;
         mode = mode || 'aes-128-cbc';
         iv = iv || this.options.iv;
-        console.log(data, secretKey, iv, mode);
-        var encipher = crypto.createCipheriv(mode, secretKey, iv),
-        encoded = encipher.update(data, 'utf8', 'hex');
-        encoded += encipher.final('hex');
-        return encoded;
+        secretKey = new Buffer(secretKey, "utf8");
+        secretKey = crypto.createHash("md5").update(secretKey).digest("hex");
+        secretKey = new Buffer(secretKey, "hex");
+        var cipher = crypto.createCipheriv(mode, secretKey, iv),coder = [];
+        coder.push(cipher.update(data, "utf8", "hex"));
+        coder.push(cipher.final("hex"));
+        return coder.join("");
     },
 
     handleError: function handleError(errcode, onlymsg) {
-        var errorConfig = think.parseConfig({
+        var errorConfig = objectAssign({
             "key": "errcode",
             "msg": "errmsg" },
-        think.config('error'));
+        this.options.error);
         var result = {};
 
         result[errorConfig.key] = errors[errcode] && errcode || 0;
