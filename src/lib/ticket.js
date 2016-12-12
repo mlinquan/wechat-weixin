@@ -6,7 +6,7 @@ module.exports = function() {
             type = type || 'jsapi';
             refresh = refresh || false;
             let token = 
-            (!refresh && ((_self.jsapi_ticket[type].expires_on > _self.timestamp()) && _self.jsapi_ticket[type]))
+            (!refresh && ((_self.jsapi_ticket[type] && _self.jsapi_ticket[type].expires_on > _self.timestamp()) && _self.jsapi_ticket[type]))
             || (!refresh && await _self.cache.get('jsapi_ticket_' + type))
             || await _self.get('/cgi-bin/ticket/getticket?access_token=ACCESS_TOKEN&type=' + type)
             ;
