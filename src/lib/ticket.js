@@ -4,7 +4,6 @@ module.exports = function() {
     this.ticket = {
         getticket: async function(type, refresh) {
             type = type || 'jsapi';
-            refresh = refresh || false;
             let token = 
             (!refresh && ((_self.jsapi_ticket[type] && _self.jsapi_ticket[type].expires_on > _self.timestamp()) && _self.jsapi_ticket[type]))
             || (!refresh && await _self.cache.get('jsapi_ticket_' + type))

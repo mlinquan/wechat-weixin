@@ -91,6 +91,19 @@ wechatapi.prototype = {
         return coder.join("");
     },
 
+    aesDecrypt: function(data, secretKey, iv, mode) {
+        secretKey = secretKey || this.options.AESKey;
+        mode = mode || 'aes-128-cbc';
+        iv = iv || this.options.iv;
+        secretKey = Buffer(secretKey, "utf8");
+        secretKey = crypto.createHash("md5").update(secretKey).digest("hex");
+        secretKey = new Buffer(secretKey, "hex");
+        var cipher = crypto.createDecipheriv(mode, secretKey, iv), coder = [];
+        coder.push(cipher.update(data, "hex", "utf8"));
+        coder.push(cipher.final("utf8"));
+        return coder.join("");
+    },
+
     handleError: function(errcode, onlymsg){
         let errorConfig = objectAssign({
             "key":"errcode",
