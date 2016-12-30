@@ -229,6 +229,7 @@ wechatapi.prototype = {
         || await this.get('/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET')
         ;
         if(token.access_token) {
+            console.log(token.access_token)
             if(token.expires_in) {
                 token.expires_in = 0;
                 token.expires_on = this.timestamp(7140);
