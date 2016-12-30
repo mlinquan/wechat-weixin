@@ -68,7 +68,7 @@ var wechatapi = function wechatapi(options) {
                                 redis || mem || disk);case 13:case 'end':return _context.stop();}}}, _callee, this);}));function get(_x) {return _ref.apply(this, arguments);}return get;}(),
 
         set: function set(key, val) {
-            redisCache && redisCache.set(key);
+            redisCache && redisCache.set(key, val);
             memoryCache.set(key, val);
             diskCache.set(key, val);
         } };

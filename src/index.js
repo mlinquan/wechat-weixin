@@ -68,7 +68,7 @@ var wechatapi = function(options) {
             return redis || mem || disk;
         },
         set: function(key, val) {
-            redisCache && redisCache.set(key);
+            redisCache && redisCache.set(key, val);
             memoryCache.set(key, val);
             diskCache.set(key, val);
         }
