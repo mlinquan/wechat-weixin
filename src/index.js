@@ -10,23 +10,7 @@ var cacheManager = require('cache-manager');
 
 var fsStore = require('cache-manager-fs');
 
-var memoryCache = cacheManager.caching({
-    store: 'memory',
-    max: 100,
-    ttl: 7140,
-    promiseDependency: Promise
-});
-
-var diskCache = cacheManager.caching({
-    store: fsStore,
-    options: {
-        ttl: 7140,
-        maxsize: 1000*1000*1000,
-        path:'cache',
-        preventfill:true
-    },
-    promiseDependency: Promise
-});
+var redisStore = require('cache-manager-redis');
 
 var errors = require('./lib/errors.js');
 var api_limit = require('./lib/api_limit.js');
@@ -34,6 +18,32 @@ var api_limit = require('./lib/api_limit.js');
 var libs = require('./lib');
 
 var wechatapi = function(options) {
+
+    var memoryCache = cacheManager.caching({
+        store: 'memory',
+        max: 100,
+        ttl: 7140,
+        promiseDependency: Promise
+    });
+
+    var diskCache = cacheManager.caching({
+        store: fsStore,
+        options: {
+            ttl: 7140,
+            maxsize: 1000*1000*1000,
+            path:'cache',
+            preventfill:true
+        },
+        promiseDependency: Promise
+    });
+
+    var redisConfig = objectAssign({}, {
+        store: redisStore,
+        ttl: 7140
+    }, options.redis);
+
+    var redisCache = options.redis && cacheManager.caching(redisConfig);
+
     this.options = objectAssign({
         pathname: 'wechatapi'
     }, options);
@@ -52,11 +62,13 @@ var wechatapi = function(options) {
 
     this.cache = {
         get: async function(key) {
+            let redis = redisCache && await redisCache.get(key);
             let mem = await memoryCache.get(key);
             let disk = await diskCache.get(key);
-            return mem || disk;
+            return redis || mem || disk;
         },
-        set: async function(key, val) {
+        set: function(key, val) {
+            redisCache && redisCache.set(key);
             memoryCache.set(key, val);
             diskCache.set(key, val);
         }
