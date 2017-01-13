@@ -138,6 +138,7 @@ wechatapi.prototype = {
     get: function () {var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(path, content) {var method = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'GET';var refresh = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;var _self, options, opt, api_name, token, data;return _regenerator2.default.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:
                             _self = this;
                             path = path.replace('APPID', _self.appid).replace('APPSECRET', _self.appsecret);
+                            console.log(path);
                             content = content || '';
                             options = {
                                 url: 'https://api.weixin.qq.com' + path,
@@ -152,17 +153,15 @@ wechatapi.prototype = {
                             if (api_name == 'user_info_batchget') {
                                 api_name = 'user_info';
                             }if (!
-                            /ACCESS_TOKEN/.test(opt.url)) {_context2.next = 16;break;}_context2.next = 10;return (
-                                _self.accessToken(refresh));case 10:token = _context2.sent;if (!
-                            token.access_token) {_context2.next = 15;break;}
-                            opt.url = opt.url.replace('ACCESS_TOKEN', token.access_token);_context2.next = 16;break;case 15:return _context2.abrupt('return',
+                            /ACCESS_TOKEN/.test(opt.url)) {_context2.next = 17;break;}_context2.next = 11;return (
+                                _self.accessToken(refresh));case 11:token = _context2.sent;if (!
+                            token.access_token) {_context2.next = 16;break;}
+                            opt.url = opt.url.replace('ACCESS_TOKEN', token.access_token);_context2.next = 17;break;case 16:return _context2.abrupt('return',
 
-                            token);case 16:_context2.next = 18;return (
-
-
-                                rp(opt));case 18:data = _context2.sent;if (!(
+                            token);case 17:_context2.next = 19;return (
 
 
+                                rp(opt));case 19:data = _context2.sent;if (!(
 
 
 
@@ -186,17 +185,14 @@ wechatapi.prototype = {
 
 
 
-                            data && data.errcode == 40001)) {_context2.next = 21;break;}return _context2.abrupt('return',
-                            _self.get(path, content, method, true));case 21:if (!(
 
 
-                            data && data.errcode)) {_context2.next = 23;break;}return _context2.abrupt('return',
-                            _self.handleError(data.errcode));case 23:return _context2.abrupt('return',
+                            data && data.errcode == 40001)) {_context2.next = 22;break;}return _context2.abrupt('return',
+                            _self.get(path, content, method, true));case 22:if (!(
 
 
-
-
-
+                            data && data.errcode)) {_context2.next = 24;break;}return _context2.abrupt('return',
+                            _self.handleError(data.errcode));case 24:return _context2.abrupt('return',
 
 
 
@@ -209,7 +205,12 @@ wechatapi.prototype = {
 
 
 
-                            data);case 24:case 'end':return _context2.stop();}}}, _callee2, this);}));function get(_x2, _x3, _x4, _x5) {return _ref2.apply(this, arguments);}return get;}(),
+
+
+
+
+
+                            data);case 25:case 'end':return _context2.stop();}}}, _callee2, this);}));function get(_x2, _x3, _x4, _x5) {return _ref2.apply(this, arguments);}return get;}(),
 
     /**
                                                                                                                                                                                               * post request

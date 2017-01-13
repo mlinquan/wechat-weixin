@@ -138,6 +138,7 @@ wechatapi.prototype = {
     get: async function(path, content, method = 'GET', refresh = false){
         let _self = this;
         path = path.replace('APPID', _self.appid).replace('APPSECRET', _self.appsecret);
+        console.log(path)
         content = content || '';
         let options = {
             url: 'https://api.weixin.qq.com' + path,

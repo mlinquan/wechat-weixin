@@ -8,6 +8,9 @@ module.exports = function() {
         },
         userinfo: async function(openid, access_token) {
             return _self.get('/sns/userinfo?access_token=' + access_token + '&openid=' + openid + '&lang=zh_CN');
+        },
+        refresh_token: async function(refresh_token) {
+            return _self.get('/sns/oauth2/refresh_token?appid=APPID&grant_type=refresh_token&refresh_token=' + refresh_token);
         }
     }
 };
