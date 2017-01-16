@@ -138,7 +138,6 @@ wechatapi.prototype = {
     get: async function(path, content, method = 'GET', refresh = false){
         let _self = this;
         path = path.replace('APPID', _self.appid).replace('APPSECRET', _self.appsecret);
-        console.log(path)
         content = content || '';
         let options = {
             url: 'https://api.weixin.qq.com' + path,
@@ -230,13 +229,12 @@ wechatapi.prototype = {
         || await this.get('/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET')
         ;
         if(token.access_token) {
-            console.log(token.access_token)
             if(token.expires_in) {
                 token.expires_in = 0;
                 token.expires_on = this.timestamp(7140);
-                this.cache.set('access_token', token);
             }
             this.access_token = token;
+            await this.cache.set('access_token', token);
         }
         return token;
     }
