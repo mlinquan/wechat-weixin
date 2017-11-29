@@ -190,8 +190,9 @@ wechatapi.prototype = {
                             _self.get(path, content, method, true));case 21:if (!(
 
 
-                            data && data.errcode)) {_context2.next = 23;break;}return _context2.abrupt('return',
-                            _self.handleError(data.errcode));case 23:return _context2.abrupt('return',
+                            data && data.errcode)) {_context2.next = 24;break;}
+                            console.log(data);return _context2.abrupt('return',
+                            _self.handleError(data.errcode));case 24:return _context2.abrupt('return',
 
 
 
@@ -209,7 +210,7 @@ wechatapi.prototype = {
 
 
 
-                            data);case 24:case 'end':return _context2.stop();}}}, _callee2, this);}));function get(_x2, _x3, _x4, _x5) {return _ref2.apply(this, arguments);}return get;}(),
+                            data);case 25:case 'end':return _context2.stop();}}}, _callee2, this);}));function get(_x2, _x3, _x4, _x5) {return _ref2.apply(this, arguments);}return get;}(),
 
     /**
                                                                                                                                                                                               * post request

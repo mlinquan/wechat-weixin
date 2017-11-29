@@ -191,6 +191,7 @@ wechatapi.prototype = {
         }
 
         if(data && data.errcode) {
+            console.log(data);
             return _self.handleError(data.errcode);
         }
 
