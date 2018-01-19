@@ -20,6 +20,9 @@ module.exports = function() {
         template_send: async function(data) {
             return _self.post('/cgi-bin/message/template/send?access_token=ACCESS_TOKEN', data);
         },
+        wxopen_template_send: async function(data) {
+            return _self.post('/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN', data);
+        },
         push_all: async function(data) {
             let user_list = await _self.user.get_all();
             user_list = user_list.data.openid;

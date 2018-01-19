@@ -1,7 +1,7 @@
 {
   "name": "wechat-weixin",
   "description": "微信服务号语义化(参考官方接口地址)接口.",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "author": "LinQuan",
   "scripts": {
     "test": "mocha --reporter spec --timeout 300000 --recursive test/",
