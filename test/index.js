@@ -1,22 +1,17 @@
 var assert = require('assert');
-var path = require('path');
-var fs = require('fs');
-var http = require('http');
-var moment = require('moment');
-
-var thinkjs = require('thinkjs');
-var instance = new thinkjs();
-instance.load();
-
+var dayjs = require('dayjs');
 
 var wechatapi = require('../index.js');
 
-var wxapi = new wechatapi({
+var config = {
     token: 'Uy84PhsFd1aD2tg',
     appid: 'wxe6864235e9306ba5',
     appsecret: '6f5dcd352048ae65fe5926647efc455d',
-    encodingAESKey: '826FLqYWmpuBgj9vbxw4f2zUwU8bPjGdhScxQHb9bRj'
-});
+    encodingAESKey: '826FLqYWmpuBgj9vbxw4f2zUwU8bPjGdhScxQHb9bRj',
+    iv: '1234567890123456'
+};
+
+var wxapi = new wechatapi(config);
 // var getHttp = function(options){
 //   var req = new http.IncomingMessage();
 //   req.headers = { 
@@ -52,7 +47,7 @@ var wxapi = new wechatapi({
 
 describe('think-wechatapi', function(){
   it('test init', function(done){
-    var wxapi = new wechatapi();
+    var wxapi = new wechatapi(config);
     done();
   })
   it('test function', function(done){
@@ -81,7 +76,7 @@ describe('think-wechatapi', function(){
         "topcolor": "#000000",
         "data": {
             "now_time": {
-                "value": moment().format("YYYY年M月D日 HH:mm:ss"),
+                "value": dayjs().format("YYYY年M月D日 HH:mm:ss"),
                 "color": "#000000"
             }
         }

@@ -1,9 +1,6 @@
 'use strict';
 
-var rp = require('request-promise');
-var objectAssign = require('object-assign');
-var fs = require('fs');
-var moment = require('moment');
+var axios = require('axios');
 var crypto = require('crypto');
 
 var cacheManager = require('cache-manager');
@@ -30,21 +27,21 @@ var wechatapi = function(options) {
         store: fsStore,
         options: {
             ttl: 7140,
-            maxsize: 1000*1000*1000,
-            path:'cache',
-            preventfill:true
+            maxsize: 1000 * 1000 * 1000,
+            path: 'cache',
+            preventfill: true
         },
         promiseDependency: Promise
     });
 
-    var redisConfig = objectAssign({}, {
+    var redisConfig = Object.assign({}, {
         store: redisStore,
         ttl: 7140
     }, options.redis);
 
     var redisCache = options.redis && cacheManager.caching(redisConfig);
 
-    this.options = objectAssign({
+    this.options = Object.assign({
         pathname: 'wechatapi'
     }, options);
     this.token = this.options.token;
@@ -57,8 +54,7 @@ var wechatapi = function(options) {
         "expires_on": 0
     };
 
-    this.jsapi_ticket = {
-    };
+    this.jsapi_ticket = {};
 
     this.cache = {
         get: async function(key) {
@@ -75,57 +71,55 @@ var wechatapi = function(options) {
     }
 
     this.api_limit = api_limit;
-    for(let name in libs) {
+    for (let name in libs) {
         this[name]();
     }
 };
 
 wechatapi.prototype = {
-    jsonpf: function(json) {
-        return JSON.parse(JSON.stringify(json));
-    },
 
-    timestamp: function(delay){
+    timestamp: function(delay) {
         delay = Number(delay) || 0;
-        return new Date().getTime() + delay*1000;
+        return new Date().getTime() + delay * 1000;
     },
 
     aesEncrypt: function(data, secretKey, iv, mode) {
-        secretKey = secretKey || this.options.AESKey;
+        secretKey = secretKey || this.options.encodingAESKey;
         mode = mode || 'aes-128-cbc';
         iv = iv || this.options.iv;
         secretKey = new Buffer(secretKey, "utf8");
         secretKey = crypto.createHash("md5").update(secretKey).digest("hex");
         secretKey = new Buffer(secretKey, "hex");
-        var cipher = crypto.createCipheriv(mode, secretKey, iv), coder = [];
+        var cipher = crypto.createCipheriv(mode, secretKey, iv),
+            coder = [];
         coder.push(cipher.update(data, "utf8", "hex"));
         coder.push(cipher.final("hex"));
         return coder.join("");
     },
 
     aesDecrypt: function(data, secretKey, iv, mode) {
-        secretKey = secretKey || this.options.AESKey;
+        secretKey = secretKey || this.options.encodingAESKey;
         mode = mode || 'aes-128-cbc';
         iv = iv || this.options.iv;
         secretKey = Buffer(secretKey, "utf8");
         secretKey = crypto.createHash("md5").update(secretKey).digest("hex");
         secretKey = new Buffer(secretKey, "hex");
-        var cipher = crypto.createDecipheriv(mode, secretKey, iv), coder = [];
+        var cipher = crypto.createDecipheriv(mode, secretKey, iv),
+            coder = [];
         coder.push(cipher.update(data, "hex", "utf8"));
         coder.push(cipher.final("utf8"));
         return coder.join("");
     },
 
-    handleError: function(errcode, onlymsg){
-        let errorConfig = objectAssign({
-            "key":"errcode",
-            "msg":"errmsg"
+    handleError: function(errcode, onlymsg) {
+        let errorConfig = Object.assign({
+            "key": "errcode",
+            "msg": "errmsg"
         }, this.options.error);
-        var result = {
-        };
+        var result = {};
         result[errorConfig.key] = (errors[errcode] && errcode) || 0;
         result[errorConfig.msg] = errors[errcode] || "";
-        if(onlymsg) {
+        if (onlymsg) {
             return result[errorConfig.msg];
         }
         return result;
@@ -135,32 +129,33 @@ wechatapi.prototype = {
      * get request
      * @return {Promise} []
      */
-    get: async function(path, content, method = 'GET', refresh = false){
+    get: async function(path, content, method = 'get', refresh = false) {
         let _self = this;
         path = path.replace('APPID', _self.appid).replace('APPSECRET', _self.appsecret);
-        content = content || '';
-        let options = {
+        content = content || {};
+        let opt = {
             url: 'https://api.weixin.qq.com' + path,
-            method: method,
-            agent:false,
-            rejectUnauthorized : false,
-            body: content,
-            json: true
+            method: method
         };
-        var opt = options;
+        if (method === 'post') {
+            opt.data = content
+        } else {
+            opt.params = content
+        }
         var api_name = path.replace('/cgi-bin/', '').replace(/\?.*/, '').split('/').join('_');
-        if(api_name == 'user_info_batchget') {
+        if (api_name == 'user_info_batchget') {
             api_name = 'user_info';
         }
-        if(/ACCESS_TOKEN/.test(opt.url)) {
+        if (/ACCESS_TOKEN/.test(opt.url)) {
             let token = await _self.accessToken(refresh);
-            if(token.access_token) {
+            if (token.access_token) {
                 opt.url = opt.url.replace('ACCESS_TOKEN', token.access_token);
             } else {
                 return token;
             }
         }
-        var data = await rp(opt);
+        var data = await axios(opt);
+        data && data.data && (data = data.data);
         // let today = moment().format('YYYY-MM-DD');
         // if(api_limit[api_name]) {
         //     let now_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -186,11 +181,11 @@ wechatapi.prototype = {
         //     });
         // }
 
-        if(data && data.errcode == 40001) {
+        if (data && data.errcode == 40001) {
             return _self.get(path, content, method, true);
         }
 
-        if(data && data.errcode) {
+        if (data && data.errcode) {
             console.log(data);
             return _self.handleError(data.errcode);
         }
@@ -212,25 +207,26 @@ wechatapi.prototype = {
         // }
         return data;
     },
+
     /**
      * post request
      * @return {Promise} []
      */
     post: async function(path, content) {
-        return this.get(path, content, 'POST');
+        return this.get(path, content, 'post');
     },
+
     /**
      * get access_token
      * @return {String} []
      */
-    accessToken: async function(refresh){
-        let token = 
-        (!refresh && ((this.access_token.expires_on > this.timestamp()) && this.access_token))
-        || (!refresh && await this.cache.get('access_token'))
-        || await this.get('/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET')
-        ;
-        if(token.access_token) {
-            if(token.expires_in) {
+    accessToken: async function(refresh) {
+        let token =
+            (!refresh && ((this.access_token.expires_on > this.timestamp()) && this.access_token)) ||
+            (!refresh && await this.cache.get('access_token')) ||
+            await this.get('/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET');
+        if (token.access_token) {
+            if (token.expires_in) {
                 token.expires_in = 0;
                 token.expires_on = this.timestamp(7140);
             }
@@ -241,7 +237,7 @@ wechatapi.prototype = {
     }
 };
 
-for(let name in libs) {
+for (let name in libs) {
     wechatapi.prototype[name] = libs[name];
 }
 

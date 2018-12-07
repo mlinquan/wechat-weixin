@@ -37,7 +37,7 @@ module.exports = function() {
             if(user.user_list.count < user.user_list.total) {
                 return get_all(user_list.next_openid);
             }
-            let all_users = _self.jsonpf(user.user_list);
+            let all_users = Object.assign({}, user.user_list);
             delete user.user_list;
             return all_users;
         },
@@ -62,7 +62,7 @@ module.exports = function() {
                 count -= 100;
                 user.user_info_list = user.user_info_list.concat(result.user_info_list);
                 if(count <= 0) {
-                    let all_info = _self.jsonpf(user.user_info_list);
+                    let all_info = Object.assign({}, user.user_info_list);
                     delete user.user_info_list;
                     return all_info;
                 }
