@@ -1,7 +1,7 @@
 {
   "name": "wechat-weixin",
   "description": "微信服务号语义化(参考官方接口地址)接口.",
-  "version": "0.0.19",
+  "version": "0.0.21",
   "author": "LinQuan",
   "scripts": {
     "test": "mocha --reporter spec --timeout 300000 --recursive test/",
@@ -14,11 +14,11 @@
   "contributors": [],
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "babel-runtime": "6.x.x",
-    "cache-manager": "^2.2.0",
-    "cache-manager-fs": "^1.0.5",
-    "cache-manager-redis": "^0.3.2",
+    "cache-manager": "^2.11.1",
+    "cache-manager-fs": "^1.0.8",
+    "cache-manager-redis-store": "^2.0.0",
     "crypto": "^0.0.3"
   },
   "devDependencies": {

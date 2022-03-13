@@ -7,7 +7,7 @@ var cacheManager = require('cache-manager');
 
 var fsStore = require('cache-manager-fs');
 
-var redisStore = require('cache-manager-redis');
+var redisStore = require('cache-manager-redis-store');
 
 var errors = require('./lib/errors.js');
 var api_limit = require('./lib/api_limit.js');
@@ -59,14 +59,29 @@ var wechatapi = function(options) {
     this.cache = {
         get: async function(key) {
             let redis = redisCache && await redisCache.get(key);
+            if(redis) {
+                return redis
+            }
             let mem = await memoryCache.get(key);
+            if(mem) {
+                return mem
+            }
             let disk = await diskCache.get(key);
-            return redis || mem || disk;
+            if(disk) {
+                return disk
+            }
+            return null
         },
-        set: function(key, val) {
-            redisCache && redisCache.set(key, val);
-            memoryCache.set(key, val);
-            diskCache.set(key, val);
+        set: async function(key, val) {
+            let redis = redisCache && await redisCache.set(key, val);
+            if(redis) {
+                return
+            }
+            let mem = await memoryCache.set(key, val);
+            if(mem) {
+                return
+            }
+            let disk = await diskCache.set(key, val);
         }
     }
 
@@ -87,9 +102,9 @@ wechatapi.prototype = {
         secretKey = secretKey || this.options.encodingAESKey;
         mode = mode || 'aes-128-cbc';
         iv = iv || this.options.iv;
-        secretKey = new Buffer(secretKey, "utf8");
+        secretKey = Buffer.from(secretKey, "utf8");
         secretKey = crypto.createHash("md5").update(secretKey).digest("hex");
-        secretKey = new Buffer(secretKey, "hex");
+        secretKey = Buffer.from(secretKey, "hex");
         var cipher = crypto.createCipheriv(mode, secretKey, iv),
             coder = [];
         coder.push(cipher.update(data, "utf8", "hex"));
@@ -101,9 +116,9 @@ wechatapi.prototype = {
         secretKey = secretKey || this.options.encodingAESKey;
         mode = mode || 'aes-128-cbc';
         iv = iv || this.options.iv;
-        secretKey = Buffer(secretKey, "utf8");
+        secretKey = Buffer.from(secretKey, "utf8");
         secretKey = crypto.createHash("md5").update(secretKey).digest("hex");
-        secretKey = new Buffer(secretKey, "hex");
+        secretKey = Buffer.from(secretKey, "hex");
         var cipher = crypto.createDecipheriv(mode, secretKey, iv),
             coder = [];
         coder.push(cipher.update(data, "hex", "utf8"));

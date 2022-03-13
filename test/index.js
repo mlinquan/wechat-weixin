@@ -8,7 +8,12 @@ var config = {
     appid: 'wxe6864235e9306ba5',
     appsecret: '6f5dcd352048ae65fe5926647efc455d',
     encodingAESKey: '826FLqYWmpuBgj9vbxw4f2zUwU8bPjGdhScxQHb9bRj',
-    iv: '1234567890123456'
+    iv: '1234567890123456',
+    redis: {
+      host: "127.0.0.1",
+      port: 6379,
+      db: 8
+    }
 };
 
 var wxapi = new wechatapi(config);
